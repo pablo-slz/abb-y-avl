@@ -10,10 +10,42 @@ class ABB():
         else:
             self.root.add(pet)
 
-    def exists(self, pet_id):
+    def update(self, pet:Pet, id: int):
+        if self.root == None:
+            raise Exception("No existen mascotas en el listado")
+        else:
+            self.root.update(pet, id)
+
+    def delete(self, id: int):
         if self.root is None:
-            return False
-        return self.root.exists(pet_id)
+            raise Exception("No existen mascotas en el listado")
+        else:
+            self.root = self.root.delete(id)
+
+    def inorder(self):
+        if self.root == None:
+            raise Exception("No existen mascotas en el listado")
+        else:
+            return self.root.inorder()
+
+    def preorder(self):
+        if self.root == None:
+            raise Exception("No existen mascotas en el listado")
+        else:
+            return self.root.preorder()
+
+    def postorder(self):
+        if self.root == None:
+            raise Exception("No existen mascotas en el listado")
+        else:
+            return self.root.postorder()
+
+    def breed_count(self):
+        if self.root is None:
+            raise Exception("No existen mascotas en el listado")
+        else:
+            return self.root.breed_count({})
+
 
 class NodeABB:
     def __init__(self, pet:Pet):
@@ -23,6 +55,8 @@ class NodeABB:
         self.size = 1
 
     def add(self, pet:Pet):
+        if pet.id == self.pet.id:
+            raise Exception("La mascota ya existe")
         if pet.id < self.pet.id:
             if self.left != None:
                 self.left.add(pet)
@@ -34,14 +68,95 @@ class NodeABB:
             self.right = NodeABB(pet)
         self.size +=1
 
-    def exists(self, pet_id):
-        if pet_id == self.pet.id:
-            return True
-        elif pet_id < self.pet.id and self.left:
-            return self.left.exists(pet_id)
-        elif pet_id > self.pet.id and self.right:
-            return self.right.exists(pet_id)
-        return False
+    def update(self, pet: Pet, id: int):
+        if self.pet.id == id:
+            self.pet.name = pet.name
+            self.pet.age = pet.age
+        elif pet.id < self.pet.id:
+            if self.left != None:
+                self.left.update(pet, id)
+            else:
+                raise Exception("No se encontró una mascota con el ID especificado")
+        elif self.right != None:
+            self.right.update(pet, id)
+        else:
+            raise Exception("No se encontró una mascota con el ID especificado")
+
+    def delete(self, id: int):
+        if id < self.pet.id:
+            if self.left is not None:
+                self.left = self.left.delete(id)
+            else:
+                raise Exception("No se encontró una mascota con ese ID")
+        elif id > self.pet.id:
+            if self.right is not None:
+                self.right = self.right.delete(id)
+            else:
+                raise Exception("No se encontró una mascota con ese ID")
+        else:
+            # Nodo encontrado
+            if self.left is None and self.right is None:
+                return None  # Caso 1: sin hijos
+            elif self.left is None:
+                return self.right  # Caso 2: solo hijo derecho
+            elif self.right is None:
+                return self.left  # Caso 2: solo hijo izquierdo
+            else:
+                # Caso 3: dos hijos
+                min_larger_node = self.right.find_min()
+                self.pet = min_larger_node.pet
+                self.right = self.right.delete(min_larger_node.pet.id)
+        return self
+
+    def find_min(self):
+        current = self
+        while current.left is not None:
+            current = current.left
+        return current
+
+    def inorder(self):
+        listPets = []
+        if self.left != None:
+            listPets.extend(self.left.inorder())
+        listPets.append(self.pet.id)
+        if self.right != None:
+            listPets.extend(self.right.inorder())
+        return listPets
+
+    def preorder(self):
+        listPets = [self.pet.id]
+        if self.left is not None:
+            listPets.extend(self.left.preorder())
+        if self.right is not None:
+            listPets.extend(self.right.preorder())
+        return listPets
+
+    def postorder(self):
+        listPets = []
+        if self.left is not None:
+            listPets.extend(self.left.postorder())
+        if self.right is not None:
+            listPets.extend(self.right.postorder())
+        listPets.append(self.pet.id)
+        return listPets
+
+    def breed_count(self, breed_dict):
+        # Contamos esta raza
+        breed = self.pet.breed
+        if breed in breed_dict:
+            breed_dict[breed] += 1
+        else:
+            breed_dict[breed] = 1
+
+        # Recorremos la rama izquierda
+        if self.left is not None:
+            self.left.breed_count(breed_dict)
+
+        # Recorremos la rama derecha
+        if self.right is not None:
+            self.right.breed_count(breed_dict)
+
+        return breed_dict
 
 
 class NodeAVL(NodeABB):

@@ -1,0 +1,26 @@
+{
+  "pet_created_success": "La mascota se creó exitosamente.",
+  "pet_already_exists": "La mascota ya existe en el sistema.",
+  "pet_not_found": "No se encontró la mascota solicitada.",
+  "pet_deleted_success": "La mascota fue eliminada correctamente.",
+  "pet_updated_success": "La información de la mascota se actualizó correctamente.",
+
+  "name_required": "El nombre de la mascota no puede estar vacío.",
+  "invalid_age": "La edad de la mascota no puede ser negativa.",
+  "breed_required": "La raza de la mascota no puede estar vacía.",
+
+  "empty_pet_list": "La lista de mascotas está vacía o aún no se ha registrado ninguna.",
+  "null_pet_list": "No se ha inicializado la lista de mascotas.",
+
+  "invalid_pet_data": "Los datos proporcionados para la mascota no son válidos.",
+  "missing_required_fields": "Faltan campos obligatorios para completar la operación.",
+  "internal_error": "Ocurrió un error interno. Por favor, intenta más tarde.",
+  "operation_not_permitted": "No tienes permisos para realizar esta operación.",
+  "invalid_request_format": "El formato de la solicitud es inválido.",
+
+  "pet_stack_overflow": "La pila de mascotas está llena, no se pueden agregar más elementos.",
+  "pet_stack_underflow": "La pila está vacía, no hay mascotas para eliminar o consultar.",
+  "invalid_priority_value": "El valor de prioridad no es válido. Debe ser un número positivo.",
+  "pet_not_match_pattern": "Los datos de la pila no siguen el patrón esperado (par, impar, etc.)."
+}
+
