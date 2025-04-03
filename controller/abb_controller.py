@@ -18,7 +18,7 @@ async def get_pets():
 
 @abb_route.post("/")
 async def create_pet(pet: Pet):
-    if abb_service.exists(pet.id):  # Validación sin recursividad
+    if abb_service.exists(pet.id):
         return {"error": f"La mascota con ID {pet.id} ya existe."}
 
     abb_service.abb.add(pet)
