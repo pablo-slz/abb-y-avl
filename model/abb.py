@@ -94,15 +94,14 @@ class NodeABB:
             else:
                 raise Exception("No se encontró una mascota con ese ID")
         else:
-            # Nodo encontrado
             if self.left is None and self.right is None:
-                return None  # Caso 1: sin hijos
+                return None
             elif self.left is None:
-                return self.right  # Caso 2: solo hijo derecho
+                return self.right
             elif self.right is None:
-                return self.left  # Caso 2: solo hijo izquierdo
+                return self.left
             else:
-                # Caso 3: dos hijos
+
                 min_larger_node = self.right.find_min()
                 self.pet = min_larger_node.pet
                 self.right = self.right.delete(min_larger_node.pet.id)
