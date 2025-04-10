@@ -140,18 +140,18 @@ class NodeABB:
         return listPets
 
     def breed_count(self, breed_dict):
-        # Contamos esta raza
+
         breed = self.pet.breed
         if breed in breed_dict:
             breed_dict[breed] += 1
         else:
             breed_dict[breed] = 1
 
-        # Recorremos la rama izquierda
+
         if self.left is not None:
             self.left.breed_count(breed_dict)
 
-        # Recorremos la rama derecha
+
         if self.right is not None:
             self.right.breed_count(breed_dict)
 
