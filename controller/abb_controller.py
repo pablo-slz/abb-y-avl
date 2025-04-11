@@ -12,7 +12,7 @@ async def get_pets():
     try:
         pets = abb_service.abb.root
         if pets is None:
-            return {"message": messages.get("null_pet_list")}
+            return {"message": messages.get("empty_pet_list")}
         return pets
     except Exception:
         return {"message": messages.get("internal_error")}
@@ -61,12 +61,26 @@ async def create_pet(pet: Pet, response: Response):
         response.status_code = status.HTTP_400_BAD_REQUEST
         return {"message": messages.get("breed_required")}
 
+    pet.gender = pet.gender.lower()
+    if pet.gender not in ("male", "female"):
+        response.status_code = status.HTTP_400_BAD_REQUEST
+        return {"message": "El género debe ser 'male' o 'female'."}
+
     try:
         abb_service.abb.add(pet)
         return {"message": messages.get("pet_created_success")}
+
+    except ValueError as ve:
+        if str(ve) == "pet_already_exists":
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return {"message": messages.get("pet_already_exists")}
+        else:
+            response.status_code = status.HTTP_400_BAD_REQUEST
+            return {"message": messages.get("invalid_pet_data")}
     except Exception:
-        response.status_code = status.HTTP_400_BAD_REQUEST
-        return {"message": messages.get("internal_error")}
+        response.status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+        return {"message": messages.get("Ocurrió un error interno. Por favor, intenta más tarde.")}
+
 
 @abb_route.put("/{id}")
 async def update_pet(id: int, pet: Pet, response: Response):
@@ -75,7 +89,7 @@ async def update_pet(id: int, pet: Pet, response: Response):
         return {"message": messages.get("pet_updated_success")}
     except Exception:
         response.status_code = status.HTTP_400_BAD_REQUEST
-        return {"message": messages.get("internal_error")}
+        return {"message": messages.get("pet_not_found")}
 
 @abb_route.delete("/{id}")
 async def delete_pet(id: int, response: Response):
@@ -93,5 +107,18 @@ async def breed_count():
     except Exception:
         return {"message": messages.get("internal_error")}
 
+@abb_route.get("/gender-summary")
+async def get_gender_summary():
+    try:
+        return abb_service.abb.gender_summary()
+    except Exception:
+        return {"message": messages.get("internal_error")}
 
 
+@abb_route.get("/arrival-order")
+async def get_arrival_order():
+    try:
+        arrival_ids = abb_service.abb.arrival_ids()
+        return {"ids": arrival_ids}
+    except Exception:
+        return {"message": messages.get("internal_error")}

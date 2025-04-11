@@ -3,12 +3,14 @@ from model.pet import Pet
 class ABB():
     def __init__(self):
         self.root = None
+        self.list_order = []
 
     def add(self, pet:Pet):
         if self.root == None:
             self.root = NodeABB(pet)
         else:
             self.root.add(pet)
+        self.list_order.append(pet)
 
     def update(self, pet:Pet, id: int):
         if self.root == None:
@@ -46,6 +48,28 @@ class ABB():
         else:
             return self.root.breed_count({})
 
+    def gender_summary(self):
+        if self.root is None:
+            raise Exception("No existen mascotas en el listado")
+        else:
+            gender_data = {}
+            self.root.collect_gender_data(gender_data)
+
+            result = {}
+            for gender, pets in gender_data.items():
+                count = len(pets)
+                avg_age = sum(pet.age for pet in pets) / count if count > 0 else 0
+                result[gender] = {
+                    "count": count,
+                    "average_age": round(avg_age, 2)
+                }
+            return result
+
+    def arrival_ids(self):
+        if not self.list_order:
+            raise Exception("No existen mascotas en el listado")
+        return [pet.id for pet in self.list_order]
+
 
 class NodeABB:
     def __init__(self, pet:Pet):
@@ -54,19 +78,21 @@ class NodeABB:
         self.right = None
         self.size = 1
 
-    def add(self, pet:Pet):
+    def add(self, pet: Pet):
         if pet.id == self.pet.id:
-            raise Exception("La mascota ya existe")
+            raise ValueError("pet_already_exists")
         if pet.id < self.pet.id:
-            if self.left != None:
+            if self.left is not None:
                 self.left.add(pet)
             else:
                 self.left = NodeABB(pet)
-        elif self.right != None:
-            self.right.add(pet)
         else:
-            self.right = NodeABB(pet)
-        self.size +=1
+            if self.right is not None:
+                self.right.add(pet)
+            else:
+                self.right = NodeABB(pet)
+
+        self.size += 1
 
     def update(self, pet: Pet, id: int):
         if self.pet.id == id:
@@ -76,11 +102,11 @@ class NodeABB:
             if self.left != None:
                 self.left.update(pet, id)
             else:
-                raise Exception("No se encontró una mascota con el ID especificado")
+                raise ValueError("pet_not_found")
         elif self.right != None:
             self.right.update(pet, id)
         else:
-            raise Exception("No se encontró una mascota con el ID especificado")
+            raise ValueError("pet_not_found")
 
     def delete(self, id: int):
         if id < self.pet.id:
@@ -94,9 +120,9 @@ class NodeABB:
             else:
                 raise Exception("No se encontró una mascota con ese ID")
         else:
-            if self.left is None and self.right is None:
-                return None
-            elif self.left is None:
+            if self.left is None and self.right is None: #cuando no hay hijos
+                return None # se elimina
+            elif self.left is None:  # izquierda
                 return self.right
             elif self.right is None:
                 return self.left
@@ -108,22 +134,21 @@ class NodeABB:
         return self
 
     def find_min(self):
-        current = self
-        while current.left is not None:
-            current = current.left
-        return current
+        if self.left is None:
+            return self
+        return self.left.find_min()
 
     def inorder(self):
         listPets = []
         if self.left != None:
             listPets.extend(self.left.inorder())
-        listPets.append(self.pet.id)
+        listPets.append(self.pet)
         if self.right != None:
             listPets.extend(self.right.inorder())
         return listPets
 
     def preorder(self):
-        listPets = [self.pet.id]
+        listPets = [self.pet]
         if self.left is not None:
             listPets.extend(self.left.preorder())
         if self.right is not None:
@@ -136,7 +161,7 @@ class NodeABB:
             listPets.extend(self.left.postorder())
         if self.right is not None:
             listPets.extend(self.right.postorder())
-        listPets.append(self.pet.id)
+        listPets.append(self.pet)
         return listPets
 
     def breed_count(self, breed_dict):
@@ -156,6 +181,18 @@ class NodeABB:
             self.right.breed_count(breed_dict)
 
         return breed_dict
+
+    def collect_gender_data(self, gender_data):
+        gender = self.pet.gender.lower()
+        if gender not in gender_data:
+            gender_data[gender] = []
+        gender_data[gender].append(self.pet)
+
+        if self.left is not None:
+            self.left.collect_gender_data(gender_data)
+        if self.right is not None:
+            self.right.collect_gender_data(gender_data)
+
 
 
 class NodeAVL(NodeABB):

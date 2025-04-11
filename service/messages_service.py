@@ -1,4 +1,3 @@
-# service/messages_service.py
 import json
 
 class MessageService:
