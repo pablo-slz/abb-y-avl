@@ -98,7 +98,7 @@ async def delete_pet(id: int, response: Response):
         return {"message": messages.get("pet_deleted_success")}
     except Exception:
         response.status_code = status.HTTP_400_BAD_REQUEST
-        return {"message": messages.get("internal_error")}
+        return {"message": messages.get("pet_not_found")}
 
 @abb_route.get("/breed")
 async def breed_count():

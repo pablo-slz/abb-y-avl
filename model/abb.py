@@ -182,6 +182,9 @@ class NodeABB:
 
         return breed_dict
 
+    #el metodo que me toco a mi fue el de crear un metodo que almacene mascotas por genero (macho o hembra)
+    # decir la cantidad que hay y el promedio de edad por genero
+
     def collect_gender_data(self, gender_data):
         gender = self.pet.gender.lower()
         if gender not in gender_data:
